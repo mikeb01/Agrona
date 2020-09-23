@@ -269,6 +269,23 @@ public class UnsafeBufferTest
         assertThrows(IllegalArgumentException.class, () -> slice.wrap(buffer, 7, 3));
     }
 
+    @Test
+    public void shouldWriteUnaligned()
+    {
+        final UnsafeBuffer arrayBuffer = new UnsafeBuffer(new byte[16]);
+        final UnsafeBuffer directBuffer = new UnsafeBuffer(ByteBuffer.allocateDirect(16));
+        final long value = 0x12_34_56_78__90_AB_CD_EFL;
+
+        for (int i = 0; i < 8; i++)
+        {
+            arrayBuffer.putLong(i, value);
+            assertEquals(value, arrayBuffer.getLong(i));
+
+            directBuffer.putLong(i, value);
+            assertEquals(value, directBuffer.getLong(i));
+        }
+    }
+
     private void assertContainsString(final UnsafeBuffer buffer, final String value, final int length)
     {
         assertEquals(value, buffer.getStringWithoutLengthAscii(INDEX, length));
